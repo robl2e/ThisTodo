@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.robl2e.thistodo.ui.edit.EditItemActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_item_desc"
+        android:textSize="24sp"
+        android:layout_marginLeft="@dimen/margin_left_border_padding"
+        android:layout_marginStart="@dimen/margin_left_border_padding"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:id="@+id/et_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:hint="@string/input_name_hint"
+        android:ems="10"
+        android:layout_marginStart="@dimen/margin_left_border_padding"
+        android:layout_marginLeft="@dimen/margin_left_border_padding"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="61dp" />
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:onClick="onSaveItem"
+        android:layout_marginLeft="@dimen/margin_left_border_padding"
+        android:layout_marginStart="@dimen/margin_left_border_padding"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="127dp" />
+</android.support.constraint.ConstraintLayout>
