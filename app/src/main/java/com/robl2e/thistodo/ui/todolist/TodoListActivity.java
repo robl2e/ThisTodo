@@ -2,6 +2,7 @@ package com.robl2e.thistodo.ui.todolist;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
@@ -20,12 +21,14 @@ import com.robl2e.thistodo.R;
 import com.robl2e.thistodo.data.model.todoitem.TodoItem;
 import com.robl2e.thistodo.data.model.todoitem.TodoItemPersistence;
 import com.robl2e.thistodo.ui.common.ItemClickSupport;
+import com.robl2e.thistodo.ui.createtodo.CreateTodoItemDialogFragment;
 import com.robl2e.thistodo.ui.edit.EditItemActivity;
-import com.robl2e.thistodo.ui.util.KeyboardUtil;
 
 import java.util.List;
 
-public class TodoListActivity extends AppCompatActivity {
+public class TodoListActivity extends AppCompatActivity implements CreateTodoItemDialogFragment.Listener {
+    private static final String TAG = TodoListActivity.class.getSimpleName();
+    private static final String TAG_CREATE_ITEM_DIALOG = TAG + "_TAG_CREATE_ITEM_DIALOG";
     private RecyclerView lvItems;
     private EditText etNewItem;
 
@@ -34,6 +37,7 @@ public class TodoListActivity extends AppCompatActivity {
     private MultiSelector multiSelector;
     private ActionMode currentActionMode;
     private ModalMultiSelectorCallback actionModeCallback;
+    private FloatingActionButton fabNewItem;
 
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, TodoListActivity.class);
@@ -74,6 +78,8 @@ public class TodoListActivity extends AppCompatActivity {
     private void bindViews() {
         etNewItem = (EditText) findViewById(R.id.et_new_item);
         lvItems = (RecyclerView) findViewById(R.id.lv_items);
+        fabNewItem = (FloatingActionButton) findViewById(R.id.fab_new_item);
+        fabNewItem.setOnClickListener(fabClickListener);
     }
 
     private void initializeList() {
@@ -92,6 +98,18 @@ public class TodoListActivity extends AppCompatActivity {
 
     private void updateListAdapter() {
         listAdapter.notifyDataSetChanged();
+    }
+
+    private View.OnClickListener fabClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showCreateItemDialog();
+        }
+    };
+
+    private void showCreateItemDialog() {
+        CreateTodoItemDialogFragment fragment = CreateTodoItemDialogFragment.newInstance();
+        fragment.showDialog(this, TAG_CREATE_ITEM_DIALOG);
     }
 
     private ItemClickSupport.OnItemClickListener itemClickListener = new ItemClickSupport.OnItemClickListener() {
@@ -136,6 +154,13 @@ public class TodoListActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onFinishedSaving(TodoItem todoItem) {
+        items.add(todoItem);
+        updateListAdapter();
+        TodoItemPersistence.writeItems(this, items);
+    }
+
     private class ActionModeCallback extends ModalMultiSelectorCallback {
         private MultiSelector multiSelector;
 
@@ -169,18 +194,6 @@ public class TodoListActivity extends AppCompatActivity {
             }
             return false;
         }
-    }
-
-    public void onAddItem(View view) {
-        String itemText = etNewItem.getText().toString();
-        if (TextUtils.isEmpty(itemText)) return;
-
-        TodoItem viewModel = new TodoItem(itemText);
-        items.add(viewModel);
-        updateListAdapter();
-        etNewItem.setText("");
-        TodoItemPersistence.writeItems(this, items);
-        KeyboardUtil.hideSoftInput(etNewItem);
     }
 }
 

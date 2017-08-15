@@ -3,10 +3,14 @@
     <string name="input_new_item_hint">Enter a new item</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>
+    <string name="create_todo">Create Todo</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="delete_items">Delete Items</string>
     <string name="edit_item_desc">Edit Item Below:</string>
     <string name="input_name_hint">Name</string>
     <string name="item_selected">%d Selected</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
 </resources>
