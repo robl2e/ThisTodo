@@ -8,6 +8,8 @@
         android:id="@+id/et_new_item"
         android:layout_width="233dp"
         android:layout_height="48dp"
+        android:imeOptions="actionDone"
+        android:inputType="textAutoComplete"
         android:hint="@string/input_name_hint"
         android:layout_marginLeft="@dimen/dialog_margin_left_border_padding"
         android:layout_marginStart="@dimen/dialog_margin_left_border_padding" />

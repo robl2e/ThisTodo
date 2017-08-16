@@ -2,6 +2,7 @@ package com.robl2e.thistodo.ui.todolist;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,10 +18,12 @@ import android.widget.EditText;
 
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.robl2e.thistodo.R;
 import com.robl2e.thistodo.data.model.todoitem.TodoItem;
 import com.robl2e.thistodo.data.model.todoitem.TodoItemPersistence;
 import com.robl2e.thistodo.ui.common.ItemClickSupport;
+import com.robl2e.thistodo.ui.createtodo.CreateTodoItemBottomDialog;
 import com.robl2e.thistodo.ui.createtodo.CreateTodoItemDialogFragment;
 import com.robl2e.thistodo.ui.edit.EditItemActivity;
 
@@ -103,13 +106,26 @@ public class TodoListActivity extends AppCompatActivity implements CreateTodoIte
     private View.OnClickListener fabClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            showCreateItemDialog();
+            showCreateItemPrompt();
+            //showCreateItemDialog();
         }
     };
 
     private void showCreateItemDialog() {
         CreateTodoItemDialogFragment fragment = CreateTodoItemDialogFragment.newInstance();
         fragment.showDialog(this, TAG_CREATE_ITEM_DIALOG);
+    }
+
+    private void showCreateItemPrompt() {
+        CreateTodoItemBottomDialog dialog = CreateTodoItemBottomDialog.newInstance(this, new CreateTodoItemBottomDialog.Listener() {
+            @Override
+            public void onFinishedSaving(TodoItem todoItem) {
+                items.add(todoItem);
+                updateListAdapter();
+                TodoItemPersistence.writeItems(TodoListActivity.this, items);
+            }
+        });
+        dialog.show();
     }
 
     private ItemClickSupport.OnItemClickListener itemClickListener = new ItemClickSupport.OnItemClickListener() {
