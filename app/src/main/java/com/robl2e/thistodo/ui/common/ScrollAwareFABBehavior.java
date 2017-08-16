@@ -7,6 +7,9 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * Hides child while scrolling
+ */
 public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
         super();
@@ -26,7 +29,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed,
                 dyUnconsumed);
 
-        if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
+        if (child.getVisibility() == View.VISIBLE) {
             // Hidden views no longer scroll events as per https://issuetracker.google.com/issues/37130108
             child.hide(new FloatingActionButton.OnVisibilityChangedListener() {
                 @Override
@@ -35,8 +38,12 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                     fab.setVisibility(View.INVISIBLE);
                 }
             });
-        } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
-            child.show();
         }
+    }
+
+    @Override
+    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child, View target) {
+        super.onStopNestedScroll(coordinatorLayout, child, target);
+        child.show();
     }
 }
