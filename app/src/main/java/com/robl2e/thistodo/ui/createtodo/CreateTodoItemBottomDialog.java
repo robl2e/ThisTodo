@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -76,12 +77,13 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
     @Override
     public void show() {
         super.show();
-        etNewItem.post(new Runnable() {
+        etNewItem.postDelayed(new Runnable() {
             @Override
             public void run() {
                 KeyboardUtil.showSoftInput(etNewItem);
             }
-        });
+        }, etNewItem.getResources()
+                .getInteger(android.R.integer.config_shortAnimTime));
     }
 
     private void save() {

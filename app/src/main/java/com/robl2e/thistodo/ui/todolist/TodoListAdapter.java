@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.bignerdranch.android.multiselector.SwappingHolder;
+import com.robl2e.thistodo.R;
 import com.robl2e.thistodo.data.model.todoitem.TodoItem;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         private TextView tvItemName;
         ViewHolder(View itemView, MultiSelector multiSelector) {
             super(itemView, multiSelector);
-            tvItemName = (TextView) itemView.findViewById(android.R.id.text1);
+            tvItemName = (TextView) itemView.findViewById(R.id.tv_name);
         }
 
         void setTodoName(String name) {
@@ -52,7 +53,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View itemView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        View itemView = inflater.inflate(R.layout.item_todo, parent, false);
         return new ViewHolder(itemView, multiSelector);
     }
 

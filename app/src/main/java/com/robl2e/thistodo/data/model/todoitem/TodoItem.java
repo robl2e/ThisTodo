@@ -6,6 +6,8 @@ package com.robl2e.thistodo.data.model.todoitem;
 
 public class TodoItem {
     private String name;
+    private Boolean isDone;
+    private Long dueDate;
 
     public TodoItem(String name) {
         this.name = name;
@@ -17,5 +19,21 @@ public class TodoItem {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getDone() {
+        return isDone;
+    }
+
+    public void setDone(Boolean done) {
+        isDone = done;
+    }
+
+    public void setDueDate(Long dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Long getDueDate() {
+        return dueDate;
     }
 }
