@@ -31,8 +31,6 @@ import java.util.List;
 public class TodoListActivity extends AppCompatActivity implements CreateTodoItemDialogFragment.Listener {
     private static final String TAG = TodoListActivity.class.getSimpleName();
     private RecyclerView lvItems;
-    private EditText etNewItem;
-
     private TodoListAdapter listAdapter;
     private List<TodoItem> items;
     private MultiSelector multiSelector;
@@ -77,7 +75,6 @@ public class TodoListActivity extends AppCompatActivity implements CreateTodoIte
     }
 
     private void bindViews() {
-        etNewItem = (EditText) findViewById(R.id.et_new_item);
         lvItems = (RecyclerView) findViewById(R.id.lv_items);
         fabNewItem = (FloatingActionButton) findViewById(R.id.fab_new_item);
         fabNewItem.setOnClickListener(fabClickListener);

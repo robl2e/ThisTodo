@@ -8,6 +8,7 @@ public class TodoItem {
     private String name;
     private Boolean isDone;
     private Long dueDate;
+    private String priority;
 
     public TodoItem(String name) {
         this.name = name;
@@ -35,5 +36,13 @@ public class TodoItem {
 
     public Long getDueDate() {
         return dueDate;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 }

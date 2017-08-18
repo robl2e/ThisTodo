@@ -43,10 +43,31 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
         app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/tv_priority_badge"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:fontFamily="sans-serif"
+        tools:text="HIGH"
+        style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
+        android:background="@drawable/btn_default"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="26dp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+    <!--TODO: When marking tasks complete -->
     <ImageView
         android:id="@+id/iv_status"
         android:visibility="invisible"
-        tools:visibility="visible"
+        tools:visibility="gone"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/checkbox_marked_circle"
