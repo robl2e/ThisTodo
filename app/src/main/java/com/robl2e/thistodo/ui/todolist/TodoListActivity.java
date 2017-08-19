@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
@@ -14,7 +15,6 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
@@ -23,12 +23,11 @@ import com.robl2e.thistodo.data.model.todoitem.TodoItem;
 import com.robl2e.thistodo.data.model.todoitem.TodoItemRepository;
 import com.robl2e.thistodo.ui.common.ItemClickSupport;
 import com.robl2e.thistodo.ui.createtodo.CreateTodoItemBottomDialog;
-import com.robl2e.thistodo.ui.createtodo.CreateTodoItemDialogFragment;
 import com.robl2e.thistodo.ui.edit.EditItemActivity;
 
 import java.util.List;
 
-public class TodoListActivity extends AppCompatActivity implements CreateTodoItemDialogFragment.Listener {
+public class TodoListActivity extends AppCompatActivity {
     private static final String TAG = TodoListActivity.class.getSimpleName();
     private RecyclerView lvItems;
     private TodoListAdapter listAdapter;
@@ -106,10 +105,27 @@ public class TodoListActivity extends AppCompatActivity implements CreateTodoIte
     };
 
     private void showCreateItemPrompt() {
-        CreateTodoItemBottomDialog dialog = CreateTodoItemBottomDialog.newInstance(this, new CreateTodoItemBottomDialog.Listener() {
+        showEditItemPrompt(null, RecyclerView.NO_POSITION);
+    }
+
+    private void showEditItemPrompt(TodoItem todoItem, Integer position) {
+        Pair<Integer, TodoItem> pairItem = null;
+        if (todoItem != null) {
+            pairItem = new Pair<>(
+                    position, todoItem);
+        }
+        CreateTodoItemBottomDialog dialog = CreateTodoItemBottomDialog.newInstance(this, pairItem , new CreateTodoItemBottomDialog.Listener() {
             @Override
             public void onFinishedSaving(TodoItem todoItem) {
                 items.add(todoItem);
+                updateListAdapter();
+                TodoItemRepository.writeItems(items);
+            }
+
+            @Override
+            public void onFinishedEditing(TodoItem todoItem, int position) {
+                items.remove(position);
+                items.add(position, todoItem);
                 updateListAdapter();
                 TodoItemRepository.writeItems(items);
             }
@@ -127,7 +143,7 @@ public class TodoListActivity extends AppCompatActivity implements CreateTodoIte
             if (!multiSelector.tapSelection(viewHolder)){
                 TodoItem todoItem = listAdapter.getItem(position);
                 if (todoItem == null) return;
-                EditItemActivity.startForResult(TodoListActivity.this, todoItem.getName(), position);
+                showEditItemPrompt(todoItem, position);
             } else {
                 setActionModeTitle();
             }
@@ -157,13 +173,6 @@ public class TodoListActivity extends AppCompatActivity implements CreateTodoIte
             int totalSelected = multiSelector.getSelectedPositions().size();
             currentActionMode.setTitle(getString(R.string.item_selected, totalSelected));
         }
-    }
-
-    @Override
-    public void onFinishedSaving(TodoItem todoItem) {
-        items.add(todoItem);
-        updateListAdapter();
-        TodoItemRepository.writeItems(items);
     }
 
     private class ActionModeCallback extends ModalMultiSelectorCallback {

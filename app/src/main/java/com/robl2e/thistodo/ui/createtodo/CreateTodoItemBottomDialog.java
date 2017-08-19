@@ -1,8 +1,9 @@
 package com.robl2e.thistodo.ui.createtodo;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.TextUtils;
@@ -10,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,25 +43,29 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
 
     private DateTime dateTime;
     private Listener listener;
+    private Pair<Integer, TodoItem> pairItem;
 
     public interface Listener {
         void onFinishedSaving(TodoItem todoItem);
+        void onFinishedEditing(TodoItem todoItem, int position);
     }
-    public static CreateTodoItemBottomDialog newInstance(Context context, Listener listener) {
+
+    public static CreateTodoItemBottomDialog newInstance(Context context, @Nullable Pair<Integer, TodoItem> pairItem, Listener listener) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View customView = inflater.inflate(R.layout.dialog_create_todo_item, null);
 
         BottomDialog.Builder builder = new BottomDialog.Builder(context)
-                .setTitle(R.string.create_todo)
+                .setTitle(pairItem != null ? R.string.edit_item : R.string.create_todo)
                 .setNegativeText(R.string.cancel)
                 .setPositiveText(R.string.save)
                 .setCustomView(customView);
 
-        return new CreateTodoItemBottomDialog(builder, customView, listener);
+        return new CreateTodoItemBottomDialog(builder, pairItem, customView, listener);
     }
 
-    protected CreateTodoItemBottomDialog(Builder builder, final View customView, Listener listener) {
+    protected CreateTodoItemBottomDialog(Builder builder, Pair<Integer, TodoItem> pairItem, final View customView, Listener listener) {
         super(builder);
+        this.pairItem = pairItem;
         this.customView = customView;
         this.listener = listener;
 
@@ -88,6 +92,11 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
     }
 
     private void setNewItemNameView() {
+        if (pairItem != null) {
+            TodoItem todoItem = pairItem.second;
+            this.etNewItem.setText(todoItem.getName());
+        }
+
         this.etNewItem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -104,7 +113,12 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
     }
 
     private void setDatePickerView() {
-        dateTime = DateTime.now(TimeZone.getDefault());
+        TodoItem todoItem = pairItem != null ? pairItem.second : null;
+        if (todoItem != null && todoItem.getDueDate() != null) {
+            dateTime = DateTime.forInstant(todoItem.getDueDate(), TimeZone.getDefault());
+        } else {
+            dateTime = DateTime.now(TimeZone.getDefault());
+        }
         btnDatePicker.setText(getFormattedDateTime(dateTime));
         btnDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +146,15 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(spPriorityPicker.getContext()
                 , R.array.priority_array, R.layout.item_priority_spinner);
         spPriorityPicker.setAdapter(adapter);
-        spPriorityPicker.setSelection(1); // default to normal
+
+        TodoItem todoItem = pairItem != null ? pairItem.second : null;
+        if (todoItem != null && !TextUtils.isEmpty(todoItem.getPriority())) {
+            Priority priority = Priority.fromValue(todoItem.getPriority());
+            int position = priority.ordinal();
+            spPriorityPicker.setSelection(position);
+        } else {
+            spPriorityPicker.setSelection(1); // default to normal
+        }
     }
 
     @Override
@@ -177,7 +199,12 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
         String itemText = getInputName();
         if (TextUtils.isEmpty(itemText)) return false;
 
-        TodoItem todoItem = new TodoItem(itemText);
+        TodoItem todoItem;
+        if (pairItem != null) {
+            todoItem = pairItem.second;
+        } else {
+            todoItem = new TodoItem(itemText);
+        }
         todoItem.setDueDate(getInputDateTime());
         todoItem.setPriority(getPriority());
         notifyListener(todoItem);
@@ -186,7 +213,11 @@ public class CreateTodoItemBottomDialog extends BottomDialog {
 
     private void notifyListener(TodoItem todoItem) {
         if (listener != null) {
-            listener.onFinishedSaving(todoItem);
+            if (pairItem != null) {
+                listener.onFinishedEditing(todoItem, pairItem.first);
+            } else {
+                listener.onFinishedSaving(todoItem);
+            }
         }
     }
 }
