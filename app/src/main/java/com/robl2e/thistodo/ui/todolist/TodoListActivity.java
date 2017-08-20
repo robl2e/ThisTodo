@@ -227,6 +227,7 @@ public class TodoListActivity extends AppCompatActivity {
                     }
                 }
                 multiSelector.clearSelections();
+                displayCurrentStateView();
                 TodoItemRepository.writeItems(items);
                 currentActionMode.finish();
                 return true;
