@@ -17,5 +17,7 @@
     <string name="priority">Priority:</string>
     <string name="item_due_on">Due on %s</string>
     <string name="todo_item_empty_text">Add something todo</string>
+    <string name="mark_done">Mark Done</string>
+    <string name="mark_not_done">Mark Not Done</string>
 
 </resources>

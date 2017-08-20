@@ -3,6 +3,7 @@ package com.robl2e.thistodo.ui.todolist;
 import android.app.Activity;
 import android.content.Intent;
 
+import android.graphics.Canvas;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +20,8 @@ import android.view.View;
 
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.loopeer.itemtouchhelperextension.ItemTouchHelperExtension;
+import com.mikepenz.itemanimators.AlphaCrossFadeAnimator;
 import com.robl2e.thistodo.R;
 import com.robl2e.thistodo.data.model.todoitem.TodoItem;
 import com.robl2e.thistodo.data.model.todoitem.TodoItemRepository;
@@ -38,6 +42,8 @@ public class TodoListActivity extends AppCompatActivity {
     private MultiSelector multiSelector;
     private ActionMode currentActionMode;
     private ModalMultiSelectorCallback actionModeCallback;
+    public ItemTouchHelperExtension itemTouchHelperExtension;
+    public ItemTouchHelperExtension.Callback callback;
 
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, TodoListActivity.class);
@@ -97,12 +103,16 @@ public class TodoListActivity extends AppCompatActivity {
         displayCurrentStateView();
         multiSelector = new MultiSelector();
         actionModeCallback = new ActionModeCallback(multiSelector);
+        callback = new ItemTouchHelperCallback();
+        itemTouchHelperExtension = new ItemTouchHelperExtension(callback);
+        itemTouchHelperExtension.attachToRecyclerView(lvItems);
         listAdapter = new TodoListAdapter(items, multiSelector);
         lvItems.setLayoutManager(new LinearLayoutManager(this));
         lvItems.setAdapter(listAdapter);
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         lvItems.addItemDecoration(itemDecoration);
+        lvItems.setItemAnimator(new AlphaCrossFadeAnimator());
         ItemClickSupport.addTo(lvItems).setOnItemClickListener(itemClickListener);
         ItemClickSupport.addTo(lvItems).setOnItemLongClickListener(itemLongClickListener);
     }
@@ -129,7 +139,7 @@ public class TodoListActivity extends AppCompatActivity {
             pairItem = new Pair<>(
                     position, todoItem);
         }
-        CreateTodoItemBottomDialog dialog = CreateTodoItemBottomDialog.newInstance(this, pairItem , new CreateTodoItemBottomDialog.Listener() {
+        CreateTodoItemBottomDialog dialog = CreateTodoItemBottomDialog.newInstance(this, pairItem, new CreateTodoItemBottomDialog.Listener() {
             @Override
             public void onFinishedSaving(TodoItem todoItem) {
                 items.add(todoItem);
@@ -155,7 +165,7 @@ public class TodoListActivity extends AppCompatActivity {
                     (TodoListAdapter.ViewHolder) lvItems.findViewHolderForAdapterPosition(position);
             if (viewHolder == null) return;
 
-            if (!multiSelector.tapSelection(viewHolder)){
+            if (!multiSelector.tapSelection(viewHolder)) {
                 TodoItem todoItem = listAdapter.getItem(position);
                 if (todoItem == null) return;
                 showEditItemPrompt(todoItem, position);
@@ -213,15 +223,64 @@ public class TodoListActivity extends AppCompatActivity {
                     if (multiSelector.isSelected(i, 0)) { // (1)
                         // remove item from list
                         items.remove(i);
+                        listAdapter.notifyItemRemoved(i);
                     }
                 }
                 multiSelector.clearSelections();
                 TodoItemRepository.writeItems(items);
-                updateListAdapter();
                 currentActionMode.finish();
                 return true;
             }
             return false;
+        }
+    }
+
+    private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.START|ItemTouchHelper.END);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            TodoItem todoItem = listAdapter.getItem(position);
+            if (todoItem != null) {
+                if (direction == ItemTouchHelper.END) {
+                    todoItem.setDone(true);
+                } else if (direction == ItemTouchHelper.START){
+                    todoItem.setDone(false);
+                }
+                listAdapter.notifyItemChanged(position);
+                TodoItemRepository.writeItems(items);
+            }
+        }
+
+        @Override
+        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+            super.onSelectedChanged(viewHolder, actionState);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            if (dY != 0 && dX == 0) super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            TodoListAdapter.ViewHolder holder = (TodoListAdapter.ViewHolder) viewHolder;
+            holder.getForegroundView().setTranslationX(dX);
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                boolean rightToLeft = dX < 0;
+                holder.setBackgroundView(rightToLeft);
+            }
         }
     }
 }

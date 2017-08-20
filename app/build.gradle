@@ -38,6 +38,10 @@ dependencies {
     compile 'io.paperdb:paperdb:2.1'
     compile 'com.code-troopers.betterpickers:library:3.1.0'
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.5'
+    compile 'com.loopeer.library:itemtouchhelperextension:1.0.5'
+    compile "com.mikepenz:itemanimators:1.0.0@aar"
+
 
     testCompile 'junit:junit:4.12'
 }

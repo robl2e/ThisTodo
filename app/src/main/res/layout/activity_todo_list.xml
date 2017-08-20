@@ -9,12 +9,14 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/lv_items"
         android:visibility="invisible"
+        tools:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@android:layout/simple_list_item_1" />
+        tools:listitem="@layout/item_todo" />
 
     <LinearLayout
         android:id="@+id/empty_view_container"
+        tools:visibility="invisible"
         android:orientation="vertical"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"

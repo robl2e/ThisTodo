@@ -5,13 +5,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.bignerdranch.android.multiselector.SwappingHolder;
+import com.loopeer.itemtouchhelperextension.Extension;
 import com.robl2e.thistodo.R;
 import com.robl2e.thistodo.data.model.todoitem.Priority;
 import com.robl2e.thistodo.data.model.todoitem.TodoItem;
@@ -22,6 +27,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
+
+import static android.R.attr.button;
+import static android.R.attr.direction;
+import static com.robl2e.thistodo.R.string.done;
 
 /**
  * Created by robl2e on 8/12/2017.
@@ -36,22 +45,35 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         this.multiSelector = multiSelector;
     }
 
-    static class ViewHolder extends SwappingHolder{
+    static class ViewHolder extends SwappingHolder implements Extension {
+        private View backgroundView;
+        private View contentView;
         private TextView tvItemName;
         private TextView tvItemSubText;
         private TextView tvPriorityBadge;
+        private ImageView ivStatusView;
+        private TextView tvBackgroundText;
 
         ViewHolder(View itemView, MultiSelector multiSelector) {
             super(itemView, multiSelector);
+            contentView = itemView.findViewById(R.id.content_view);
+            backgroundView = itemView.findViewById(R.id.background_view);
+            tvBackgroundText = (TextView) backgroundView.findViewById(R.id.text_background_view);
             tvItemName = (TextView) itemView.findViewById(R.id.tv_name);
             tvItemSubText = (TextView) itemView.findViewById(R.id.tv_subtext);
             tvPriorityBadge = (TextView) itemView.findViewById(R.id.tv_priority_badge);
+            ivStatusView = (ImageView) itemView.findViewById(R.id.iv_status);
         }
 
         void bindView(TodoItem viewModel) {
             setItemNameView(viewModel.getName());
             setDueDateView(viewModel.getDueDate());
             setPriorityView(viewModel.getPriority());
+            setItemStatusView(viewModel.getDone());
+        }
+
+        public View getForegroundView() {
+            return contentView;
         }
 
         private void setItemNameView(String name) {
@@ -95,6 +117,40 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
             }
             tvPriorityBadge.setText(priority.getValue());
         }
+
+        private void setItemStatusView(Boolean done) {
+            if (done != null && done) {
+                ivStatusView.setVisibility(View.VISIBLE);
+                tvPriorityBadge.setVisibility(View.INVISIBLE);
+            } else {
+                ivStatusView.setVisibility(View.INVISIBLE);
+                tvPriorityBadge.setVisibility(View.VISIBLE);
+            }
+        }
+
+        void setBackgroundView(boolean isRightToLeft) {
+            if (isRightToLeft) {
+                backgroundView.setBackgroundColor(backgroundView.getResources()
+                        .getColor(R.color.red));
+                tvBackgroundText.setText(R.string.mark_not_done);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)tvBackgroundText.getLayoutParams();
+                params.gravity = Gravity.RIGHT|Gravity.END;
+                tvBackgroundText.setLayoutParams(params);
+            } else {
+                backgroundView.setBackgroundColor(backgroundView.getResources()
+                        .getColor(R.color.colorAccent));
+                tvBackgroundText.setText(R.string.mark_done);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)tvBackgroundText.getLayoutParams();
+                params.gravity = Gravity.LEFT|Gravity.START;
+                tvBackgroundText.setLayoutParams(params);
+            }
+        }
+
+        @Override
+        public float getActionWidth() {
+            return backgroundView.getWidth();
+        }
+
     }
 
     @Nullable
