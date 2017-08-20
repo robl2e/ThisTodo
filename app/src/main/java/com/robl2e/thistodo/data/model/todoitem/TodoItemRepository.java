@@ -20,9 +20,10 @@ public class TodoItemRepository {
     }
 
     public static void writeItems(List<TodoItem> todoItems) {
-        if (todoItems == null) return;
-        if (todoItems.isEmpty()) return;
-
+        if (todoItems == null || todoItems.isEmpty()) {
+            LocalPersistence.getInstance().delete(TODO_ITEM_LIST);
+            return;
+        }
         LocalPersistence.getInstance().write(TODO_ITEM_LIST, todoItems);
     }
 }

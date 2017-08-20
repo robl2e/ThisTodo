@@ -30,12 +30,14 @@ import java.util.List;
 public class TodoListActivity extends AppCompatActivity {
     private static final String TAG = TodoListActivity.class.getSimpleName();
     private RecyclerView lvItems;
+    private FloatingActionButton fabNewItem;
+    private View emptyView;
+
     private TodoListAdapter listAdapter;
     private List<TodoItem> items;
     private MultiSelector multiSelector;
     private ActionMode currentActionMode;
     private ModalMultiSelectorCallback actionModeCallback;
-    private FloatingActionButton fabNewItem;
 
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, TodoListActivity.class);
@@ -73,14 +75,26 @@ public class TodoListActivity extends AppCompatActivity {
         }
     }
 
+    private void displayCurrentStateView() {
+        if (items != null && items.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+            lvItems.setVisibility(View.INVISIBLE);
+        } else {
+            emptyView.setVisibility(View.INVISIBLE);
+            lvItems.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void bindViews() {
         lvItems = (RecyclerView) findViewById(R.id.lv_items);
+        emptyView = findViewById(R.id.empty_view_container);
         fabNewItem = (FloatingActionButton) findViewById(R.id.fab_new_item);
         fabNewItem.setOnClickListener(fabClickListener);
     }
 
     private void initializeList() {
         items = TodoItemRepository.readItems();
+        displayCurrentStateView();
         multiSelector = new MultiSelector();
         actionModeCallback = new ActionModeCallback(multiSelector);
         listAdapter = new TodoListAdapter(items, multiSelector);
@@ -95,6 +109,7 @@ public class TodoListActivity extends AppCompatActivity {
 
     private void updateListAdapter() {
         listAdapter.notifyDataSetChanged();
+        displayCurrentStateView();
     }
 
     private View.OnClickListener fabClickListener = new View.OnClickListener() {

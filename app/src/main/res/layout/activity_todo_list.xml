@@ -8,9 +8,30 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/lv_items"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@android:layout/simple_list_item_1" />
+
+    <LinearLayout
+        android:id="@+id/empty_view_container"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/calendar_plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/todo_item_empty_text" />
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_new_item"
